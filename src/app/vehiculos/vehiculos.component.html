@@ -1,0 +1,135 @@
+<div class="container" *ngIf="isLogued">
+  <h1>Vehiculos</h1>
+  <mat-form-field>
+    <input class="container-fluid" matInput (keyup.enter)="buscarDominio($event.target.value)" placeholder="Dominio">
+  </mat-form-field>
+  <mat-form-field>
+    <input class="container-fluid" matInput (keyup.enter)="buscarTramite($event.target.value)" placeholder="Certificado Baja">
+  </mat-form-field>
+  <mat-form-field>
+    <input class="container-fluid" matInput (keyup.enter)="buscarSiniestro($event.target.value)"
+      placeholder="Numero de Siniestro">
+  </mat-form-field>
+  <mat-form-field>
+    <input class="container-fluid" matInput (keyup.enter)="buscarChasis($event.target.value)"
+      placeholder="Numero de Chasis">
+  </mat-form-field>
+  <mat-form-field>
+    <input class="container-fluid" matInput (keyup.enter)="buscarEtiqueta($event.target.value)"
+      placeholder="Numero de Etiqueta">
+  </mat-form-field>
+
+  <table mat-table [dataSource]="vehiculosDataSource" multiTemplateDataRows class="mat-elevation-z8">
+    <ng-container matColumnDef="{{column}}" *ngFor="let column of columnsToDisplay">
+      <th mat-header-cell *matHeaderCellDef> {{column | titlecase}} </th>
+      <td mat-cell *matCellDef="let element"> {{element[column]}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="editar">
+      <mat-header-cell>Custom Title</mat-header-cell>
+      <mat-cell *matCellDef="let element"> ICONO </mat-cell>
+    </ng-container>
+
+    <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+        <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <div class="example-element-diagram">
+            <div class="example-element-position"> <strong>Etiquetas:</strong> </div>
+            <div class="example-element-name">Cant. Etiquetas: {{element.cantidadEtiquetas}} </div>
+            <div class="example-element-name">Inicio: {{element.fechaInicio}} </div>
+            <div class="example-element-name">Fin: {{element.fechaFin}} </div>
+          </div>
+          <div class="example-element-diagram">
+            <div class="example-element-position"> <strong>Motor: </strong></div>
+            <div class="example-element-name"> {{element.marcaMotor}} </div>
+            <div class="example-element-name"> {{element.numeroMotor}} </div>
+          </div>
+          <div class="example-element-diagram">
+            <div class="example-element-position"> <strong>Chasis:</strong> </div>
+            <div class="example-element-name"> {{element.marcaChasis}} </div>
+            <div class="example-element-name"> {{element.numeroChasis}} </div>
+          </div>
+          <div class="example-element-description">
+            <p>Registro: {{element.registroSeccional}} - {{element.titular}}</p>
+            <p>{{element.localidad}} - {{element.provincia}}</p>
+          </div>
+          <div class="example-element-description">
+            <button mat-raised-button class="btn btn-primary btn-sm" [mdePopoverTriggerFor]="appPopover"
+              mdePopoverTriggerOn="click" (click)="getVehiculoPartes(element.idVehiculo)">
+              Ver Partes
+            </button>
+          </div>
+          <div class="example-element-description">
+            <button mat-raised-button class="btn btn-primary btn-sm" [mdePopoverTriggerFor]="appPopover"
+              mdePopoverTriggerOn="click" (click)="editarVehiculo(element.idVehiculo)">
+              Editar
+            </button>
+          </div>
+          <div class="example-element-description">
+            <button
+              class="btn btn-primary btn-sm"
+              mat-raised-button color="accent" [mdePopoverTriggerFor]="appPopoverPago" mdePopoverTriggerOn="click"
+              (click)="setVehiculoActual(element)">
+              Observacion!
+            </button>
+          </div>
+          <div class="example-element-description">
+            <button class="btn btn-primary btn-sm delete" mat-icon-button color="primary"
+              (click)="eliminarVehiculo(element.idVehiculo)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+    <tr mat-row *matRowDef="let element; columns: columnsToDisplay;" class="example-element-row"
+      [class.example-expanded-row]="expandedElement === element"
+      (click)="expandedElement = expandedElement === element ? null : element">
+    </tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+  </table>
+  <!-- <div>
+  <div class="row">
+    <div class="col-xs-10">
+    </div>
+    <div class="col-xs-1" [hidden]="ultimoAnterior()">
+      <mat-icon (click)="irAnterior()" style="cursor: pointer;">navigate_before</mat-icon>
+    </div>
+    <div class="col-xs-1" [hidden]="ultimoSiguiente()">
+      <mat-icon (click)="irSiguiente()" style="cursor: pointer;">navigate_next</mat-icon>
+    </div>
+  </div>
+</div> -->
+
+  <mat-card *ngIf="isLoading" style="display: flex; justify-content: center; align-items: center">
+    <mat-progress-spinner color="primary" mode="indeterminate">
+    </mat-progress-spinner>
+  </mat-card>
+
+  <mde-popover #appPopover="mdePopover" [mdePopoverOverlapTrigger]="false" [mdePopoverCloseOnClick]="false">
+    <mat-card style="max-width: 300px">
+      <mat-card-content>
+        <h4>Partes</h4>
+
+        <div [hidden]="vehiculoPartes.length">{{textoLoadingPartes}}</div>
+
+        <div *ngFor="let vehiculoParte of vehiculoPartes">
+          {{ getParteNombre(vehiculoParte.idParte )}} - {{vehiculoParte.numeroEtiqueta}}
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </mde-popover>
+
+  <mde-popover #appPopoverPago="mdePopover" [mdePopoverOverlapTrigger]="false" [mdePopoverCloseOnClick]="false">
+    <mat-card style="max-width: 300px">
+      <mat-card-content>
+        <h4>Observación</h4>
+        {{ vehiculoActual.observacionPago }}
+      </mat-card-content>
+    </mat-card>
+  </mde-popover>
+</div>

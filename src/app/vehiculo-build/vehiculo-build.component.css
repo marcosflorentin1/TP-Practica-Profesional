@@ -1,0 +1,33 @@
+.form-row {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  label {
+    position: absolute;
+    top: 0;
+    padding: 7px 0 0 13px;
+    transition: all 200ms;
+    opacity: 0.5;
+  }
+  
+  .form-control:focus + label,
+  .form-control:valid + label {
+    font-size: 75%;
+    transform: translate3d(0, -100%, 0);
+    opacity: 1;
+  }
+
+  .input-parte{
+    width: auto !important;
+    height: 30px !important;
+  }
+
+  hr{
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .checkbox-pago{
+    top: -5px !important
+  }

@@ -1,0 +1,40 @@
+<div class="container" *ngIf="isAdmin">
+    <h3>Lista de Usuarios</h3>
+    <div class="row">
+        <div class="col-xs-7">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <td>Usuario</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let usuario of usuarios">
+                        <td>{{usuario.usuario}}</td>
+                        <td>
+                            <button mat-icon-button color="primary" (click)="eliminarUsuario(usuario.idUsuario)" *ngIf="usuario.usuario != 'admin'">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-5">
+            <h3>Agregar Nuevo Usuario</h3>
+            <form novalidate [formGroup]="usuarioForm">
+                <label for="usuarioInput">Usuario</label>
+                <input type="text" id="usuarioInput" formControlName="usuario" class="form-control" autocomplete="off"
+                    required>
+
+                <label for="passInput">Contraseña</label>
+                <input type="password" id="passInput" formControlName="pass" class="form-control" autocomplete="off"
+                    required>
+
+                <button type="submit" class="btn btn-primary" (click)="agregarUsuario()"
+                    [disabled]="usuarioForm.invalid">Agregar</button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,134 @@
+<h2 *ngIf="!partesCargadas">Cargando...</h2>
+<div class="container" *ngIf="isLogued && partesCargadas">
+    <h2>{{ title }}</h2>
+
+    <div>
+        <form novalidate [formGroup]="vehiculoForm">
+            <div class="col-xs-5">
+                <h3>Datos</h3>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="numeroSiniestroInput" formControlName="numeroSiniestro"
+                        required>
+                    <label for="numeroSiniestroInput">Numero de Siniestro</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="dominioInput" formControlName="dominio">
+                    <label for="dominioInput">Dominio</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="formulario04dInput" formControlName="formulario04d">
+                    <label for="formulario04dInput">Formulario 04d</label>
+                    
+                    <div class="form-group">
+                        <input type="file" name="image" (change)="fileProgress($event)" />
+                    </div>
+                    <div *ngIf="fileUploadProgress">
+                        Upload progress: {{ fileUploadProgress }}
+                    </div>
+                    <div class="image-preview mb-3" *ngIf="previewUrl">
+                        <img [src]="previewUrl" height="30" />                 
+                    </div>
+         
+                    <div class="mb-3" *ngIf="uploadedFilePath">
+                        {{uploadedFilePath}}
+                    </div>
+                     
+                    <div class="form-group">
+                        <button class="btn btn-primary"  (click)="onSubmit()">Submit</button>
+                    </div>
+
+                    <!-- <button (click)="cargarImagen04Frente($event)">Cargar Fotos 04 Frente {{ fileUploadProgress }}</button> -->
+                    <!-- <button (click)="cargarImagen04Dorso($event)">Cargar Fotos 04 Dorso {{ fileUploadProgress }}</button> -->
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="certificadoBajaInput" formControlName="certificadoBaja">
+                    <label for="certificadoBajaInput">Certificado de Baja</label>
+                    <button (click)="cargarImagenesBaja">Cargar Fotos Baja</button>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="registroSeccionalInput"
+                        formControlName="registroSeccional">
+                    <label for="registroSeccionalInput">Registro Seccional</label>
+                </div>
+
+                <div class="form-row">
+                    <input type="number" class="form-control" id="cantidadEtiquetasInput"
+                        formControlName="cantidadEtiquetas">
+                    <label for="cantidadEtiquetasInput">Cantidad de Etiquetas</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="titularInput" formControlName="titular">
+                    <label for="titularInput">Titular</label>
+                </div>
+                <div class=" form-row">
+                    <input type="text" class="form-control" id="marcaInput" formControlName="marca">
+                    <label for="marcaInput">Marca</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="modeloInput" formControlName="modelo">
+                    <label for="modeloInput">Modelo</label>
+                </div>
+                <div class="form-row">
+
+                    <input type="text" class="form-control" id="marcaMotorInput" formControlName="marcaMotor">
+                    <label for="marcaMotorInput">Marca del Motor</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="numeroMotorInput" formControlName="numeroMotor">
+                    <label for="numeroMotorInput">Numero de Motor</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="marcaChasisInput" formControlName="marcaChasis">
+                    <label for="marcaChasisInput">Marca de Chasis</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="numeroChasisInput" formControlName="numeroChasis">
+                    <label for="numeroChasisInput">Numero de Chasis</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="localidadInput" formControlName="localidad">
+                    <label for="localidadInput">Localidad</label>
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-control" id="provinciaInput" formControlName="provincia">
+                    <label for="provinciaInput">Provincia</label>
+                </div>
+                <div class="form-row">
+                    Estado del trámite
+                    <select class="form-control" formControlName="estado">
+                        <option value="VEHIC. INGRESADO" selected>VEHIC. INGRESADO</option>
+                        <option value="FORM. 04 ENTREGADO">FORM 04 ENTREGADO</option>
+                        <option value="PAGADO">PAGADO</option>
+                        <option value="STICKERS RETIRADOS">STICKERS RETIRADOS</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <textarea class="form-control" id="observacionPagoInput"
+                        formControlName="observacionPago"></textarea>
+                    <label for="observacionPagoInput">Observacion del Pago</label>
+                </div>
+
+                <br>
+                <div class="form-row">
+                    <button type="submit" class="btn btn-primary" (click)="onSubmit()"
+                        [disabled]="vehiculoForm.invalid">Guardar</button>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <h3>Partes</h3>
+                <div *ngIf="partes.length">
+                    <div *ngFor="let parte of partes">
+                        <hr *ngIf="isEditMode">
+                        <input type="checkbox" (change)="onChecklistChange($event.target.checked, parte)"
+                            [checked]="parte.checked" [value]="parte.checked" />
+                        <span>{{ parte.descripcion | titlecase }}</span>
+                        <input type="text" [value]="parte.numeroEtiqueta" id="etiqueta" *ngIf="parte.checked"
+                            (input)="parte.numeroEtiqueta = $event.target.value" class="form-control input-parte"
+                            required />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

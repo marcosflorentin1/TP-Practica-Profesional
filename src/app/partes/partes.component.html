@@ -1,0 +1,37 @@
+<div class="container" *ngIf="isLogued">
+
+    <div class="row">
+        <div class="col-xs-7">
+            <h3>Lista de Partes</h3>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <td>Descripción</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let parte of partes">
+                        <td>{{parte.descripcion}}</td>
+                        <td>
+                            <button mat-icon-button color="primary" (click)="eliminarParte(parte.idParte)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-5">
+            <h3>Agregar Nueva Parte</h3>
+            <form novalidate [formGroup]="parteForm">
+                <label for="descripcionInput">Descripcion</label>
+                <input type="text" id="descripcionInput" formControlName="descripcion" class="form-control"
+                    autocomplete="off" required>
+
+                <button type="submit" class="btn btn-primary" (click)="agregarParte()"
+                    [disabled]="parteForm.invalid">Agregar</button>
+            </form>
+        </div>
+    </div>
+</div>

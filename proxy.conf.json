@@ -1,0 +1,7 @@
+{
+    "/api/*": {
+      "target": "http://mafco.com.ar",
+      "secure": false,
+      "changeOrigin": true
+    }
+}

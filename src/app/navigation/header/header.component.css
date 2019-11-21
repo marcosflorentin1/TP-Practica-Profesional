@@ -1,0 +1,15 @@
+li {
+    cursor: pointer;
+}
+
+.nav-main-link {
+    color: white !important;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+    background-color: #bd910d;
+}
+
+.bg-primary {
+    background-color: #ffc312!important;
+}
