@@ -31,3 +31,17 @@
   .checkbox-pago{
     top: -5px !important
   }
+
+  .divs{
+    display: block; 
+    width: 100%; 
+    clear:both;
+  }
+
+  .repetido {
+    background-color: red;
+  }
+
+  .valido {
+    background-color: green;
+  }

@@ -27,13 +27,15 @@ export class VehiculosComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   isLogued: boolean = true;
-  pageSize: number = 3;
+  pageSize: number = 100;
   isLoading: boolean = false;
   partes: Parte[] = [];
   vehiculoPartes: VehiculoParte[] = [];
   textoLoadingPartes: string = '';
   vehiculoActual: Vehiculo = new Vehiculo;
   expandedElement: Vehiculo;
+  //linkImagen: string = "http://derepuestos.com.ar/api/foto/images/";
+  linkImagen: string = "fotos/images/";
 
   public columnsToDisplay = [
     'marca',
@@ -49,7 +51,8 @@ export class VehiculosComponent implements OnInit {
 
   vehiculosDataSource = new MatTableDataSource<Vehiculo>();
   params: Params = new Params();
-
+  
+    
   constructor(
     private vehiculoService: VehiculoService,
     private router: Router,
@@ -73,17 +76,21 @@ export class VehiculosComponent implements OnInit {
     let vehiculos: Vehiculo[];
     this.isLoading = true;
     this.vehiculosDataSource.data = [];
+    this.params.pageSize = this.pageSize
+
     this.vehiculoService.getData('vehiculo.php', this.params).toPromise()
       .then(result => {
         vehiculos = result as Vehiculo[];
         this.vehiculosDataSource.data = vehiculos;
-        this.params.ultimoIdVehiculo = (vehiculos.length) ? vehiculos[vehiculos.length - 1].idVehiculo.toString() : '1';
+        this.params.ultimoIdVehiculo = (vehiculos.length) ? vehiculos[vehiculos.length - 1].idVehiculo.toString() : '999999999999';
         this.isLoading = false;
       })
   }
 
   public loadPartes(): void {
-    this.vehiculoService.getData('parte.php', new Params()).toPromise()
+    let params = new Params();
+
+    this.vehiculoService.getData('parte.php', params).toPromise()
       .then(result => {
         this.partes = result as Parte[];
       })
@@ -103,7 +110,9 @@ export class VehiculosComponent implements OnInit {
   }
 
   getParteNombre(idParte: number): string {
-    return this.partes.find(p => p.idParte == idParte).descripcion;
+    let nombre = (this.partes.find(p => p.idParte == idParte)) ? this.partes.find(p => p.idParte == idParte).descripcion : 'Parte eliminada';
+    
+    return nombre;
   }
 
   setVehiculoActual(vehiculo: Vehiculo){
@@ -166,7 +175,7 @@ export class VehiculosComponent implements OnInit {
   }
 
   private resetFilters() {
-    this.params.ultimoIdVehiculo = '1';
+    this.params.ultimoIdVehiculo = '999999999999';
     this.params.operador = 's';
     this.params.dominio = '';
     this.params.tramite = '';

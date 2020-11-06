@@ -18,6 +18,7 @@ import { UsuarioComponent } from './usuario/usuario.component'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DialogComponent } from './common/dialog/dialog.component';
 import {  MatDialogModule } from '@angular/material';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -40,12 +41,15 @@ import {  MatDialogModule } from '@angular/material';
     ReactiveFormsModule,
     MdePopoverModule,
     NgbModule,
-    MatDialogModule
+    MatDialogModule,
+    NgxSpinnerModule
   ],
   entryComponents: [
     DialogComponent
   ],
-  providers: [CookieService],
+  providers: [
+    CookieService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

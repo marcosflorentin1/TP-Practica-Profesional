@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Parte } from '../models/parte';
 import { VehiculoService } from '../services/vehiculo.service';
@@ -11,6 +11,7 @@ import { LoginService } from '../login/login.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Estado } from '../common/enums';
 import { ImageService } from '../services/image.service';
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-vehiculo-build',
@@ -30,6 +31,10 @@ export class VehiculoBuildComponent implements OnInit {
   previewUrl: any = null;
   fileUploadProgress: string = null;
   uploadedFilePath: string = null;
+  linkImagen: string = 'fotos?dominio=';
+  cantidadSeleccionadas: number = 0;
+  chasisRepetido: boolean = false;
+  delayTimer: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -38,7 +43,8 @@ export class VehiculoBuildComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private loginService: LoginService,
     private cookieService: CookieService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private spinner: NgxSpinnerService
   ) { }
 
   ngOnInit() {
@@ -56,7 +62,7 @@ export class VehiculoBuildComponent implements OnInit {
         registroSeccional: [''],
         fechaInicio: [''],
         fechaFin: [''],
-        cantidadEtiquetas: [''],
+        cantidadEtiquetas: [this.cantidadSeleccionadas, ''],
         titular: [''],
         marca: [''],
         modelo: [''],
@@ -87,6 +93,7 @@ export class VehiculoBuildComponent implements OnInit {
             // vehiculo.fechaInicio = moment(vehiculo.fechaInicio, "DD/MM/YYYY").format();
             // vehiculo.fechaFin = (vehiculo.fechaFin  == "11/11/1111") ? "" : moment(vehiculo.fechaFin, "DD/MM/YYYY").format();
             this.vehiculoForm.setValue(vehiculo);
+            this.cantidadSeleccionadas = this.vehiculoForm.controls['cantidadEtiquetas'].value;
           });
       }
     }
@@ -95,7 +102,9 @@ export class VehiculoBuildComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {
+  onSubmit(event): void {
+    document.getElementById(event.target.id).hidden = true;
+
     let vehiculoParte: VehiculoParte = new VehiculoParte();
 
     //salvando usuario y fecha creacion
@@ -137,20 +146,15 @@ export class VehiculoBuildComponent implements OnInit {
           this.router.navigate(['vehiculos']);
         }
       });
-
-    //imagen stuff
-    const formData = new FormData();
-    formData.append('file', this.fileData);
-    this.imageService.post(formData)
-      .subscribe(res => {
-        console.log(res);
-        this.uploadedFilePath = res.data.filePath;
-        alert('SUCCESS !!');
-      })
   }
 
   onChecklistChange(value: boolean, item: Parte): void {
     item.checked = value;
+    (value)
+      ? this.cantidadSeleccionadas++
+      : this.cantidadSeleccionadas--;
+
+    this.vehiculoForm.controls['cantidadEtiquetas'].setValue(this.cantidadSeleccionadas);
   }
 
   public getPartes() {
@@ -183,28 +187,43 @@ export class VehiculoBuildComponent implements OnInit {
       });
   }
 
+  cargarImagen(): void {
+    this.router.navigateByUrl('/api/foto/');
 
-  //IMAGENNN
-  fileProgress(fileInput: any) {
-    this.fileData = <File>fileInput.target.files[0];
-    this.preview();
   }
 
-  preview() {
-    // Show preview 
-    var mimeType = this.fileData.type;
-    if (mimeType.match(/image\/*/) == null) {
-      return;
-    }
-
-    var reader = new FileReader();
-    reader.readAsDataURL(this.fileData);
-    reader.onload = (_event) => {
-      this.previewUrl = reader.result;
-    }
+  ocultar(event) {
+    document.getElementById(event.target.id).hidden = true;
   }
 
-  cargarImagen04Dorso(): void {
+  chasisCambiado(event: any): void {
+    let _this = this;
 
+    if (event.target.value) {
+      clearTimeout(this.delayTimer);
+      this.delayTimer = setTimeout(function () {
+        
+        _this.spinner.show();
+
+        _this.vehiculoService.getDataByDominio('vehiculo.php', event.target.value)
+          .toPromise()
+          .then((vehiculo: Vehiculo) => {
+            if (!vehiculo) {
+              document.getElementById(event.target.id).classList.remove("repetido");
+              document.getElementById(event.target.id).classList.add("valido");
+              (<HTMLInputElement> document.getElementById("submitButton")).disabled = false;
+            } else {
+              document.getElementById(event.target.id).classList.remove("valido");
+              document.getElementById(event.target.id).classList.add("repetido");
+              (<HTMLInputElement> document.getElementById("submitButton")).disabled = true;
+            }
+            
+            _this.spinner.hide();
+          });
+      }, 1500);
+    } else{
+      document.getElementById(event.target.id).classList.remove("valido");
+      document.getElementById(event.target.id).classList.remove("repetido");
+    }
   }
 }

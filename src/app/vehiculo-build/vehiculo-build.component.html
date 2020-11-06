@@ -3,7 +3,7 @@
     <h2>{{ title }}</h2>
 
     <div>
-        <form novalidate [formGroup]="vehiculoForm">
+        <form novalidate [formGroup]="vehiculoForm" (keydown.enter)="$event.preventDefault()">
             <div class="col-xs-5">
                 <h3>Datos</h3>
                 <div class="form-row">
@@ -12,38 +12,23 @@
                     <label for="numeroSiniestroInput">Numero de Siniestro</label>
                 </div>
                 <div class="form-row">
-                    <input type="text" class="form-control" id="dominioInput" formControlName="dominio">
+                    <input type="text" class="form-control checkexist" formControlName="dominio" id="dominioInput" name="dominioInput" (keydown)="chasisCambiado($event)">
                     <label for="dominioInput">Dominio</label>
+                    <div *ngIf="chasisRepetido">Este numero de Chasis ya existe</div>
+                    <ngx-spinner></ngx-spinner>
                 </div>
                 <div class="form-row">
                     <input type="text" class="form-control" id="formulario04dInput" formControlName="formulario04d">
                     <label for="formulario04dInput">Formulario 04d</label>
-                    
-                    <div class="form-group">
-                        <input type="file" name="image" (change)="fileProgress($event)" />
-                    </div>
-                    <div *ngIf="fileUploadProgress">
-                        Upload progress: {{ fileUploadProgress }}
-                    </div>
-                    <div class="image-preview mb-3" *ngIf="previewUrl">
-                        <img [src]="previewUrl" height="30" />                 
-                    </div>
-         
-                    <div class="mb-3" *ngIf="uploadedFilePath">
-                        {{uploadedFilePath}}
-                    </div>
-                     
-                    <div class="form-group">
-                        <button class="btn btn-primary"  (click)="onSubmit()">Submit</button>
-                    </div>
-
-                    <!-- <button (click)="cargarImagen04Frente($event)">Cargar Fotos 04 Frente {{ fileUploadProgress }}</button> -->
-                    <!-- <button (click)="cargarImagen04Dorso($event)">Cargar Fotos 04 Dorso {{ fileUploadProgress }}</button> -->
+                
+                    <div class="divs" *ngIf="vehiculoForm.controls['dominio'].value" (click)="ocultar($event)"><a id="aref04f" href="{{ linkImagen + vehiculoForm.controls['dominio'].value + '&tipo=' + 'front04'}}" target="_blank">Cargar Foto 04 Frontal</a></div>
+                    <div class="divs" *ngIf="vehiculoForm.controls['dominio'].value" (click)="ocultar($event)"><a id="aref04b" href="{{ linkImagen + vehiculoForm.controls['dominio'].value + '&tipo=' + 'back04'}}" target="_blank">Cargar Foto 04 Dorsal</a></div>
                 </div>
                 <div class="form-row">
                     <input type="text" class="form-control" id="certificadoBajaInput" formControlName="certificadoBaja">
                     <label for="certificadoBajaInput">Certificado de Baja</label>
-                    <button (click)="cargarImagenesBaja">Cargar Fotos Baja</button>
+                    <div class="divs" *ngIf="vehiculoForm.controls['dominio'].value" (click)="ocultar($event)"><a id="arefbajaf" href="{{ linkImagen + vehiculoForm.controls['dominio'].value + '&tipo=' + 'frontbaja'}}" target="_blank">Cargar Foto Baja Frontal</a></div>
+                    <div class="divs" *ngIf="vehiculoForm.controls['dominio'].value" (click)="ocultar($event)"><a id="arefbajab" href="{{ linkImagen + vehiculoForm.controls['dominio'].value + '&tipo=' + 'backbaja'}}" target="_blank">Cargar Foto Baja Dorsal</a></div>
                 </div>
                 <div class="form-row">
                     <input type="text" class="form-control" id="registroSeccionalInput"
@@ -51,11 +36,11 @@
                     <label for="registroSeccionalInput">Registro Seccional</label>
                 </div>
 
-                <div class="form-row">
+                <!-- <div class="form-row">
                     <input type="number" class="form-control" id="cantidadEtiquetasInput"
-                        formControlName="cantidadEtiquetas">
-                    <label for="cantidadEtiquetasInput">Cantidad de Etiquetas</label>
-                </div>
+                        formControlName="cantidadEtiquetas" value="{{ cantidadSeleccionadas }}">
+                    <label for="cantidadEtiquetasInput">Cantidad de Etiquetas: {{ cantidadSeleccionadas }}</label>
+                </div> -->
                 <div class="form-row">
                     <input type="text" class="form-control" id="titularInput" formControlName="titular">
                     <label for="titularInput">Titular</label>
@@ -111,11 +96,11 @@
 
                 <br>
                 <div class="form-row">
-                    <button type="submit" class="btn btn-primary" (click)="onSubmit()"
+                    <button type="submit" class="btn btn-primary" (click)="onSubmit($event)" id="submitButton"
                         [disabled]="vehiculoForm.invalid">Guardar</button>
                 </div>
             </div>
-            <div class="col-xs-7">
+            <div class="col-xs-5">
                 <h3>Partes</h3>
                 <div *ngIf="partes.length">
                     <div *ngFor="let parte of partes">
@@ -127,6 +112,11 @@
                             (input)="parte.numeroEtiqueta = $event.target.value" class="form-control input-parte"
                             required />
                     </div>
+                </div>
+            </div>
+            <div class="col-xs-2">
+                <div class="form-row">
+                    <label for="cantidadEtiquetasInput">Cantidad de Etiquetas: {{ cantidadSeleccionadas }}</label>
                 </div>
             </div>
         </form>

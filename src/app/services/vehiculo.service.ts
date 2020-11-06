@@ -13,6 +13,10 @@ export class VehiculoService {
   public getData = (route: string, params: Params) => {
     return this.http.get(this.createCompleteRoute(route, environment.urlAddress, params));
   }
+  
+  public getDataByDominio = (route: string, dominio_query: string) => {
+    return this.http.get(`${environment.urlAddress}/${route}?dominio_query=${dominio_query}`, this.generateHeaders());
+  }
 
   public getDataById = (route: string, id: number) => {
     return this.http.get(`${environment.urlAddress}/${route}?idVehiculo=${id}`, this.generateHeaders());
@@ -31,7 +35,7 @@ export class VehiculoService {
   }
 
   private createCompleteRoute = (route: string, envAddress: string, params: Params = null) => {
-    return `${envAddress}/${route}?ultimoIdVehiculo=${params.ultimoIdVehiculo}&operador=${params.operador}&dominio=${params.dominio}&tramite=${params.tramite}&siniestro=${params.siniestro}&chasis=${params.chasis}&etiqueta=${params.etiqueta}`;
+    return `${envAddress}/${route}?ultimoIdVehiculo=${params.ultimoIdVehiculo}&operador=${params.operador}&dominio=${params.dominio}&tramite=${params.tramite}&siniestro=${params.siniestro}&chasis=${params.chasis}&etiqueta=${params.etiqueta}&pageSize=${params.pageSize}`;
   }
 
   private generateHeaders = () => {

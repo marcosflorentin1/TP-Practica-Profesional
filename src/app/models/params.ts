@@ -6,4 +6,5 @@ export class Params {
     siniestro: string;
     chasis: string;
     etiqueta: string;
+    pageSize: number;
 }

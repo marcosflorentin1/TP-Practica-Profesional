@@ -1,6 +1,6 @@
 {
     "/api/*": {
-      "target": "http://mafco.com.ar",
+      "target": "https://derepuestos.com.ar",
       "secure": false,
       "changeOrigin": true
     }
